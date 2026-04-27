@@ -1,26 +1,143 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@font-face {
+  font-family: "Doppo";
+  src: url("/fonts/DoppoV6-Thin.woff2") format("woff2");
+  font-weight: 100;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Doppo";
+  src: url("/fonts/DoppoV6-Extralight.woff2") format("woff2");
+  font-weight: 200;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Doppo";
+  src: url("/fonts/DoppoV6-Light.woff2") format("woff2");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Doppo";
+  src: url("/fonts/DoppoV6-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Doppo";
+  src: url("/fonts/DoppoV6-Medium.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Doppo";
+  src: url("/fonts/DoppoV6-Semibold.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Doppo";
+  src: url("/fonts/DoppoV6-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Doppo";
+  src: url("/fonts/DoppoV6-Extrabold.woff2") format("woff2");
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Doppo";
+  src: url("/fonts/DoppoV6-Heavy.woff2") format("woff2");
+  font-weight: 850;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Doppo";
+  src: url("/fonts/DoppoV6-Black.woff2") format("woff2");
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Doppo Expanded Black";
+  src: url("/fonts/DoppoV6-ExpandedBlack.woff2") format("woff2");
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: "Doppo", var(--font-noto-jp), var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-main: #082032;
+  --color-main-hover: #2c394b;
+  --color-accent: #ff4c29;
+  --color-accent-hover: #ff7359;
+  --color-bg: #fcfcfc;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-feature-settings: "ss01", "ss02", "ss03", "ss04", "ss06";
+  font-weight: 400;
+  background-color: var(--color-bg);
+  color: var(--color-main);
+}
+
+::selection {
+  background-color: rgba(255, 76, 41, 0.8);
+  color: white;
+}
+
+button,
+a,
+[role="button"] {
+  cursor: pointer;
+}
+
+.textarea-auto {
+  field-sizing: content;
+  resize: none;
+}
+
+@keyframes toastIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes toastOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(16px);
+  }
 }
