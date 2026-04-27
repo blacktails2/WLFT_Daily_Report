@@ -7,6 +7,7 @@ export const tasks = pgTable("tasks", {
   archived: boolean("archived").notNull().default(false),
   sortOrder: integer("sort_order").notNull().default(0),
   trelloCardId: text("trello_card_id"),
+  nameOverridden: boolean("name_overridden").notNull().default(false),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });

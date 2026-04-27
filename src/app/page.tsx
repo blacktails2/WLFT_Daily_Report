@@ -193,7 +193,7 @@ function HomeContent() {
       </div>
 
       {/* Overview */}
-      <div className="mb-8">
+      <div className="mt-16 mb-8">
         <label
           className="block mb-2 text-[var(--color-accent)]"
           style={{
@@ -227,7 +227,7 @@ function HomeContent() {
       </div>
 
       {/* Task Time Allocation */}
-      <div className="mb-6">
+      <div className="mt-16 mb-6">
         <div className="flex items-center justify-between mb-3">
           <label
             className="text-[var(--color-accent)]"

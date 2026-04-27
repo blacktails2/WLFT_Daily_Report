@@ -60,7 +60,7 @@ export async function POST() {
     if (existing) {
       // Update name if changed, archive if closed
       const updates: Record<string, unknown> = {};
-      if (existing.name !== card.name) updates.name = card.name;
+      if (existing.name !== card.name && !existing.nameOverridden) updates.name = card.name;
       // Only auto-archive when Trello card is closed; never auto-restore
       // (manual archives must remain archived regardless of Trello state)
       if (card.closed && !existing.archived) updates.archived = true;

@@ -11,7 +11,7 @@ export async function PUT(
   const body = await request.json();
 
   const updates: Record<string, unknown> = { updatedAt: new Date() };
-  if (body.name !== undefined) updates.name = body.name;
+  if (body.name !== undefined) { updates.name = body.name; updates.nameOverridden = true; }
   if (body.color !== undefined) updates.color = body.color;
   if (body.archived !== undefined) updates.archived = body.archived;
   if (body.sortOrder !== undefined) updates.sortOrder = body.sortOrder;
