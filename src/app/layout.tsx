@@ -36,7 +36,7 @@ export default function RootLayout({
     >
       <body className="min-h-full bg-[var(--color-bg)] text-[var(--color-main)]">
         <Nav />
-        <main className="ml-16">{children}</main>
+        <main className="ml-0 md:ml-16">{children}</main>
       </body>
     </html>
   );

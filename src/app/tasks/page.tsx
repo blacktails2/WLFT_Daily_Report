@@ -14,12 +14,6 @@ interface Task {
   sortOrder: number;
 }
 
-const headingStyle = {
-  fontFamily: '"Doppo Expanded Black", sans-serif',
-  fontSize: "24px",
-  fontFeatureSettings: '"ss01", "ss02", "ss03", "ss04", "ss06"',
-};
-
 export default function TasksPage() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [newTaskName, setNewTaskName] = useState("");
@@ -77,7 +71,7 @@ export default function TasksPage() {
   const archivedTasks = tasks.filter((t) => t.archived);
 
   return (
-    <div className="max-w-3xl px-6 pt-18 pb-6 relative z-10">
+    <div className="max-w-3xl px-4 pt-6 pb-24 md:px-6 md:pt-18 md:pb-6 relative z-10">
       <PageTitle title="Tasks" />
 
       {/* Add Task */}
@@ -93,10 +87,9 @@ export default function TasksPage() {
             }
           }}
           placeholder="New task name... (⌘+Enter)"
-          className={`flex-1 bg-transparent py-2 focus:outline-none transition-all ease-in duration-100 border-b ${
+          className={`flex-1 bg-transparent py-2 focus:outline-none transition-all ease-in duration-100 text-[18px] md:text-[21px] border-b ${
             newTaskName ? "border-[var(--color-main)]" : "border-transparent focus:border-[var(--color-main)]"
           }`}
-          style={{ fontSize: "21px" }}
         />
         <button
           onClick={createTask}
@@ -109,15 +102,14 @@ export default function TasksPage() {
 
       {/* Current Tasks */}
       <div className="mb-8">
-        <label className="block mb-3 text-[var(--color-accent)]" style={headingStyle}>
+        <label className="block mb-3 text-[var(--color-accent)] heading-expanded text-[20px] md:text-[24px]">
           Current Tasks
         </label>
 
         {activeTasks.map((task) => (
           <div
             key={task.id}
-            className="border-t border-[var(--color-main)] pt-3 pb-10 flex items-center gap-3"
-            style={{ fontSize: "21px" }}
+            className="border-t border-[var(--color-main)] pt-3 pb-10 flex items-center gap-3 text-[18px] md:text-[21px]"
           >
             <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: task.color }} />
 
@@ -181,9 +173,8 @@ export default function TasksPage() {
               {archivedTasks.map((task) => (
                 <div
                   key={task.id}
-                  className="border-t border-[var(--color-main)] pt-3 pb-10 flex items-center gap-3 opacity-40"
-                  style={{ fontSize: "21px" }}
-                >
+                  className="border-t border-[var(--color-main)] pt-3 pb-10 flex items-center gap-3 opacity-40 text-[18px] md:text-[21px]"
+                      >
                   <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: task.color }} />
                   <span className="flex-1">{task.name}</span>
                   <button

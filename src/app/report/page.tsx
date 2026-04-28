@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useSyncExternalStore } from "react";
 import dynamic from "next/dynamic";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { PageTitle } from "@/components/page-title";
@@ -74,12 +74,6 @@ function ChartTooltip({ active, payload }: { active?: boolean; payload?: Tooltip
   );
 }
 
-const headingStyle = {
-  fontFamily: '"Doppo Expanded Black", sans-serif',
-  fontSize: "24px",
-  fontFeatureSettings: '"ss01", "ss02", "ss03", "ss04", "ss06"',
-};
-
 const SHORT_MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const FULL_MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
@@ -119,10 +113,23 @@ function fmt(d: Date) {
   return d.toISOString().split("T")[0];
 }
 
+function useIsMobile() {
+  return useSyncExternalStore(
+    (cb) => {
+      const mq = window.matchMedia("(max-width: 767px)");
+      mq.addEventListener("change", cb);
+      return () => mq.removeEventListener("change", cb);
+    },
+    () => window.matchMedia("(max-width: 767px)").matches,
+    () => false,
+  );
+}
+
 export default function ReportPage() {
   const [period, setPeriod] = useState<Period>("month");
   const [offset, setOffset] = useState(0);
   const [data, setData] = useState<StatsData | null>(null);
+  const isMobile = useIsMobile();
 
   const range = useMemo(() => getDateRange(period, offset), [period, offset]);
 
@@ -147,22 +154,22 @@ export default function ReportPage() {
   const donutData = data?.totals.map((t) => ({ ...t, fill: t.taskColor })) || [];
 
   return (
-    <div className="max-w-5xl px-6 pt-18 pb-6 relative z-10">
+    <div className="max-w-5xl px-4 pt-6 pb-24 md:px-6 md:pt-18 md:pb-6 relative z-10">
       <PageTitle title="Analytics" />
 
       {/* Period Navigation */}
-      <div className="flex items-start justify-between mb-8">
+      <div className="flex flex-col gap-4 mb-8 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <div className="font-light" style={{ fontSize: "48px", lineHeight: 1 }}>
+          <div className="font-light text-[28px] md:text-[48px]" style={{ lineHeight: 1 }}>
             {range.label}
           </div>
           {data && grandTotal > 0 && (
-            <div className="font-semibold" style={{ fontSize: "48px", lineHeight: 1 }}>
+            <div className="font-semibold text-[28px] md:text-[48px]" style={{ lineHeight: 1 }}>
               {grandTotal}h
             </div>
           )}
         </div>
-        <div className="flex items-center gap-1 pt-1">
+        <div className="flex items-center gap-1">
           {/* Period Toggle */}
           <div className="flex items-center gap-1 mr-2">
             {(["week", "month", "year"] as Period[]).map((p) => (
@@ -200,10 +207,10 @@ export default function ReportPage() {
         <>
           {/* Stacked Bar Chart */}
           <div className="mt-16 mb-12">
-            <h2 className="text-[var(--color-accent)] mb-4" style={headingStyle}>
+            <h2 className="text-[var(--color-accent)] mb-4 heading-expanded text-[20px] md:text-[24px]">
               Daily Breakdown
             </h2>
-            <div className="h-64">
+            <div className="h-48 md:h-64">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={data.daily} barCategoryGap="30%">
                   <XAxis
@@ -233,10 +240,10 @@ export default function ReportPage() {
 
           {/* Donut Chart */}
           <div className="mt-16 mb-8">
-            <h2 className="text-[var(--color-accent)] mb-4" style={headingStyle}>
+            <h2 className="text-[var(--color-accent)] mb-4 heading-expanded text-[20px] md:text-[24px]">
               Task Distribution
             </h2>
-            <div className="h-[432px] relative">
+            <div className="h-[280px] md:h-[432px] relative">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
@@ -245,8 +252,8 @@ export default function ReportPage() {
                     nameKey="taskName"
                     cx="50%"
                     cy="45%"
-                    innerRadius={115}
-                    outerRadius={132}
+                    innerRadius={isMobile ? 70 : 115}
+                    outerRadius={isMobile ? 87 : 132}
                     cornerRadius={9}
                     paddingAngle={3}
                   />
@@ -262,7 +269,7 @@ export default function ReportPage() {
                 className="absolute left-1/2 pointer-events-none"
                 style={{ top: "45%", transform: "translate(-50%, -50%)" }}
               >
-                <div className="text-center font-semibold" style={{ fontSize: "32px", lineHeight: 1 }}>
+                <div className="text-center font-semibold text-[24px] md:text-[32px]" style={{ lineHeight: 1 }}>
                   {grandTotal}h
                 </div>
               </div>

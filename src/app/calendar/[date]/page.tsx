@@ -225,7 +225,7 @@ export default function CalendarDetailPage() {
   }, [loadOlder, loadNewer]);
 
   return (
-    <div className="max-w-3xl px-6 pt-18 pb-6 relative z-10">
+    <div className="max-w-3xl px-4 pt-6 pb-24 md:px-6 md:pt-18 md:pb-6 relative z-10">
       <PageTitle title="Detail" />
       <div className="sticky top-0 bg-[var(--color-bg)] z-20 flex items-center justify-end py-4 -mx-6 px-6 mb-6">
         <button

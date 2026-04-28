@@ -17,7 +17,11 @@ export function Nav() {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed left-4 top-1/2 -translate-y-1/2 z-50 flex flex-col gap-2">
+    <nav className={cn(
+      "fixed z-50 flex",
+      "bottom-4 left-1/2 -translate-x-1/2 flex-row gap-1 bg-[var(--color-bg)]/80 backdrop-blur-lg shadow-lg rounded-full px-2 py-1.5",
+      "md:bottom-auto md:left-4 md:top-1/2 md:translate-x-0 md:-translate-y-1/2 md:flex-col md:gap-2 md:bg-transparent md:backdrop-blur-none md:shadow-none md:rounded-none md:px-0 md:py-0"
+    )}>
       {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
         const isActive =
           href === "/"

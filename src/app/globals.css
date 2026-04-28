@@ -120,6 +120,12 @@ a,
   resize: none;
 }
 
+.heading-expanded {
+  font-family: "Doppo Expanded Black", sans-serif !important;
+  font-feature-settings: "ss01", "ss02", "ss03", "ss04", "ss06" !important;
+  line-height: 1.15 !important;
+}
+
 @keyframes toastIn {
   from {
     opacity: 0;

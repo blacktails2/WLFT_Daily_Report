@@ -58,18 +58,11 @@ export default function ImportPage() {
   }
 
   return (
-    <div className="max-w-3xl px-6 pt-18 pb-6 relative z-10">
+    <div className="max-w-3xl px-4 pt-6 pb-24 md:px-6 md:pt-18 md:pb-6 relative z-10">
       <PageTitle title="Import" />
 
       {/* Title */}
-      <h1
-        className="text-[var(--color-accent)] mb-2"
-        style={{
-          fontFamily: '"Doppo Expanded Black", sans-serif',
-          fontSize: "24px",
-          fontFeatureSettings: '"ss01", "ss02", "ss03", "ss04", "ss06"',
-        }}
-      >
+      <h1 className="text-[var(--color-accent)] mb-2 heading-expanded text-[20px] md:text-[24px]">
         Import Sidenote
       </h1>
       <p className="text-sm text-[var(--color-main-hover)] mb-8">

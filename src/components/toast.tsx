@@ -38,7 +38,7 @@ export function Toast({ message, duration = 2000, onDone }: ToastProps) {
 
   return (
     <div
-      className="fixed bottom-6 left-1/2 -translate-x-1/2 px-4 py-2 bg-[var(--color-bg)] text-[var(--color-main)] border border-[var(--color-main)] text-sm z-50"
+      className="fixed bottom-20 md:bottom-6 left-1/2 -translate-x-1/2 px-4 py-2 bg-[var(--color-bg)] text-[var(--color-main)] border border-[var(--color-main)] text-sm z-50"
       style={{
         animation: exiting
           ? "toastOut 0.3s ease-in forwards"

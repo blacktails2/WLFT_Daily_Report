@@ -151,14 +151,14 @@ function HomeContent() {
   }
 
   return (
-    <div className="max-w-3xl px-6 pt-18 pb-6 relative z-10">
+    <div className="max-w-3xl px-4 pt-6 pb-24 md:px-6 md:pt-18 md:pb-6 relative z-10">
       <PageTitle title="Report" />
       {/* Date Selector */}
       <div className="mb-8">
-        <div className="font-extralight" style={{ fontSize: "72px", lineHeight: 0.9, letterSpacing: "-0.025em" }}>
+        <div className="font-extralight text-[48px] md:text-[72px]" style={{ lineHeight: 0.9, letterSpacing: "-0.025em" }}>
           {displayDateParts(date).datePart}
         </div>
-        <div className="font-extralight text-[var(--color-main-hover)]" style={{ fontSize: "72px", lineHeight: 0.9, letterSpacing: "-0.025em" }}>
+        <div className="font-extralight text-[var(--color-main-hover)] text-[48px] md:text-[72px]" style={{ lineHeight: 0.9, letterSpacing: "-0.025em" }}>
           {displayDateParts(date).dayPart}
         </div>
         <div className="flex items-center gap-3 mt-3">
@@ -194,14 +194,7 @@ function HomeContent() {
 
       {/* Overview */}
       <div className="mt-16 mb-8">
-        <label
-          className="block mb-2 text-[var(--color-accent)]"
-          style={{
-            fontFamily: '"Doppo Expanded Black", sans-serif',
-            fontSize: "24px",
-            fontFeatureSettings: '"ss01", "ss02", "ss03", "ss04", "ss06"',
-          }}
-        >
+        <label className="block mb-2 text-[var(--color-accent)] heading-expanded text-[20px] md:text-[24px]">
           Overview
         </label>
         <div className="flex items-end gap-3">
@@ -229,14 +222,7 @@ function HomeContent() {
       {/* Task Time Allocation */}
       <div className="mt-16 mb-6">
         <div className="flex items-center justify-between mb-3">
-          <label
-            className="text-[var(--color-accent)]"
-            style={{
-              fontFamily: '"Doppo Expanded Black", sans-serif',
-              fontSize: "24px",
-              fontFeatureSettings: '"ss01", "ss02", "ss03", "ss04", "ss06"',
-            }}
-          >
+          <label className="text-[var(--color-accent)] heading-expanded text-[20px] md:text-[24px]">
             Time Allocation
           </label>
           <span className="text-sm font-semibold">
@@ -259,8 +245,7 @@ function HomeContent() {
               return (
                 <div
                   key={task.id}
-                  className="border-t border-[var(--color-main)] pt-3 pb-10"
-                  style={{ fontSize: "21px" }}
+                  className="border-t border-[var(--color-main)] pt-3 pb-10 text-[18px] md:text-[21px]"
                 >
                   <div className="flex items-center gap-3">
                     {/* Color Dot */}

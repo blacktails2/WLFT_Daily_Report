@@ -34,14 +34,8 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-[var(--color-bg)]">
       <div className="w-full max-w-sm px-6">
         <h1
-          className="text-[var(--color-accent)] mb-10"
-          style={{
-            fontFamily: '"Doppo Expanded Black", sans-serif',
-            fontSize: "36px",
-            fontFeatureSettings: '"ss01", "ss02", "ss03", "ss04", "ss06"',
-            letterSpacing: "-0.015em",
-            lineHeight: 1,
-          }}
+          className="text-[var(--color-accent)] mb-10 heading-expanded text-[28px] md:text-[36px]"
+          style={{ letterSpacing: "-0.015em" }}
         >
           Daily Report
         </h1>
@@ -53,8 +47,7 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Password"
-              className="w-full py-2 pr-10 bg-transparent border-b border-[var(--color-main)] focus:outline-none focus:border-[var(--color-accent)] transition-all ease-in duration-100"
-              style={{ fontSize: "21px" }}
+              className="w-full py-2 pr-10 bg-transparent border-b border-[var(--color-main)] focus:outline-none focus:border-[var(--color-accent)] transition-all ease-in duration-100 text-[18px] md:text-[21px]"
               autoFocus
             />
             <button

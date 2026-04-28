@@ -117,14 +117,7 @@ export function TrelloSettings({ onSync }: { onSync: () => void }) {
 
   return (
     <div>
-      <h2
-        className="text-[var(--color-accent)] mb-4"
-        style={{
-          fontFamily: '"Doppo Expanded Black", sans-serif',
-          fontSize: "24px",
-          fontFeatureSettings: '"ss01", "ss02", "ss03", "ss04", "ss06"',
-        }}
-      >
+      <h2 className="text-[var(--color-accent)] mb-4 heading-expanded text-[20px] md:text-[24px]">
         Trello Integration
       </h2>
 

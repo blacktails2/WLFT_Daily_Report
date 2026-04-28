@@ -49,7 +49,7 @@ function HourDots({ entries }: { entries: ReportEntry[] }) {
       {dots.map((color, i) => (
         <div
           key={i}
-          className="w-[6px] h-[6px] rounded-full shrink-0"
+          className="w-1 h-1 md:w-[6px] md:h-[6px] rounded-full shrink-0"
           style={{ backgroundColor: color }}
         />
       ))}
@@ -108,12 +108,12 @@ export default function CalendarPage() {
   }, [reports]);
 
   return (
-    <div className="max-w-4xl px-6 pt-18 pb-6 relative z-10">
+    <div className="max-w-4xl px-3 pt-6 pb-24 md:px-6 md:pt-18 md:pb-6 relative z-10">
       <PageTitle title="Calendar" />
 
       {/* Month Navigation */}
       <div className="flex items-center justify-between mb-6">
-        <h1 className="font-light" style={{ fontSize: "48px", lineHeight: 1 }}>
+        <h1 className="font-light text-[32px] md:text-[48px]" style={{ lineHeight: 1 }}>
           {monthNames[month]} {year}
         </h1>
         <div className="flex items-center gap-1">
@@ -165,17 +165,16 @@ export default function CalendarPage() {
             <button
               key={i}
               onClick={() => router.push(`/calendar/${dateStr}`)}
-              className="p-1.5 pb-3 text-left transition-all ease-in duration-100 rounded-[8px] flex flex-col hover:bg-gray-100"
+              className="p-1 pb-2 md:p-1.5 md:pb-3 text-left transition-all ease-in duration-100 rounded-[8px] flex flex-col hover:bg-gray-100"
             >
               <span
-                className={`block leading-none mb-2 ${
+                className={`block leading-none mb-2 text-[16px] md:text-[24px] ${
                   isToday
                     ? "font-bold text-[var(--color-accent)]"
                     : isWeekend
                       ? "text-[var(--color-main-hover)] opacity-50"
                       : ""
                 }`}
-                style={{ fontSize: "24px" }}
               >
                 {day}
               </span>
