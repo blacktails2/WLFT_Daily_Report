@@ -19,20 +19,56 @@ interface ReportSummary {
   entries: ReportEntry[];
 }
 
+interface CalendarDay {
+  day: number;
+  month: number;
+  year: number;
+  isOverflow: boolean;
+}
+
 const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
-function getMonthDays(year: number, month: number) {
+function getMonthDays(year: number, month: number): CalendarDay[] {
   const firstDay = new Date(year, month, 1);
   const lastDay = new Date(year, month + 1, 0);
 
   let startOffset = firstDay.getDay() - 1;
   if (startOffset < 0) startOffset = 6;
 
-  const days: (number | null)[] = [];
-  for (let i = 0; i < startOffset; i++) days.push(null);
-  for (let d = 1; d <= lastDay.getDate(); d++) days.push(d);
+  const days: CalendarDay[] = [];
+
+  // Previous month overflow days
+  if (startOffset > 0) {
+    const prevLastDay = new Date(year, month, 0);
+    const prevMonth = prevLastDay.getMonth();
+    const prevYear = prevLastDay.getFullYear();
+    const prevLastDate = prevLastDay.getDate();
+    for (let i = startOffset - 1; i >= 0; i--) {
+      days.push({ day: prevLastDate - i, month: prevMonth, year: prevYear, isOverflow: true });
+    }
+  }
+
+  // Current month days
+  for (let d = 1; d <= lastDay.getDate(); d++) {
+    days.push({ day: d, month, year, isOverflow: false });
+  }
+
+  // Next month overflow days to complete the last week
+  const remainder = days.length % 7;
+  if (remainder > 0) {
+    const nextMonth = month === 11 ? 0 : month + 1;
+    const nextYear = month === 11 ? year + 1 : year;
+    const fill = 7 - remainder;
+    for (let d = 1; d <= fill; d++) {
+      days.push({ day: d, month: nextMonth, year: nextYear, isOverflow: true });
+    }
+  }
 
   return days;
+}
+
+function formatDateStr(y: number, m: number, d: number) {
+  return `${y}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
 }
 
 function HourDots({ entries }: { entries: ReportEntry[] }) {
@@ -63,10 +99,14 @@ export default function CalendarPage() {
   const [reports, setReports] = useState<Record<string, ReportSummary>>({});
   const router = useRouter();
 
+  const days = useMemo(() => getMonthDays(year, month), [year, month]);
+
   useEffect(() => {
-    const from = `${year}-${String(month + 1).padStart(2, "0")}-01`;
-    const lastDay = new Date(year, month + 1, 0).getDate();
-    const to = `${year}-${String(month + 1).padStart(2, "0")}-${String(lastDay).padStart(2, "0")}`;
+    // Use the actual grid range (including overflow days) for the API fetch
+    const first = days[0];
+    const last = days[days.length - 1];
+    const from = formatDateStr(first.year, first.month, first.day);
+    const to = formatDateStr(last.year, last.month, last.day);
 
     fetch(`/api/daily-reports?from=${from}&to=${to}`)
       .then((r) => r.json())
@@ -75,7 +115,7 @@ export default function CalendarPage() {
         for (const r of data) map[r.date] = r;
         setReports(map);
       });
-  }, [year, month]);
+  }, [days]);
 
   function navigate(offset: number) {
     let m = month + offset;
@@ -86,7 +126,6 @@ export default function CalendarPage() {
     setMonth(m);
   }
 
-  const days = getMonthDays(year, month);
   const today = new Date();
   const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
 
@@ -146,10 +185,8 @@ export default function CalendarPage() {
 
       {/* Calendar Grid */}
       <div className="grid grid-cols-7 gap-1">
-        {days.map((day, i) => {
-          if (day === null) return <div key={i} />;
-
-          const dateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+        {days.map((cd, i) => {
+          const dateStr = formatDateStr(cd.year, cd.month, cd.day);
           const report = reports[dateStr];
           const isToday = dateStr === todayStr;
           const hasReport = !!report;
@@ -157,9 +194,9 @@ export default function CalendarPage() {
           const totalHours = report?.entries?.reduce((s, e) => s + e.hours, 0) || 0;
           const hasContent = hasReport && (totalHours > 0 || !!report.overview);
 
-          // Day of week: 0=Sun,6=Sat → isWeekend
-          const dow = new Date(year, month, day).getDay();
+          const dow = new Date(cd.year, cd.month, cd.day).getDay();
           const isWeekend = dow === 0 || dow === 6;
+          const isDimmed = cd.isOverflow || isWeekend;
 
           return (
             <button
@@ -171,12 +208,12 @@ export default function CalendarPage() {
                 className={`block leading-none mb-2 text-[16px] md:text-[24px] ${
                   isToday
                     ? "font-bold text-[var(--color-accent)]"
-                    : isWeekend
+                    : isDimmed
                       ? "text-[var(--color-main-hover)] opacity-50"
                       : ""
                 }`}
               >
-                {day}
+                {cd.day}
               </span>
               {/* Always render for consistent row height; hidden when no content */}
               <div className={hasContent ? "" : "invisible"}>
