@@ -120,6 +120,19 @@ a,
   resize: none;
 }
 
+.page-title-text {
+  writing-mode: horizontal-tb;
+  text-align: right;
+}
+
+@media (min-width: 1024px) {
+  .page-title-text {
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    text-align: initial;
+  }
+}
+
 .heading-expanded {
   font-family: "Doppo Expanded Black", sans-serif !important;
   font-feature-settings: "ss01", "ss02", "ss03", "ss04", "ss06" !important;
