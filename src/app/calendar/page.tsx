@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useLayoutEffect, useMemo, useRef, useCallback, Fragment } from "react";
+import { useState, useEffect, useMemo, useRef, useCallback, Fragment } from "react";
 import { ChevronUp, ChevronDown } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { PageTitle } from "@/components/page-title";
@@ -169,6 +169,8 @@ function HourDots({ entries }: { entries: ReportEntry[] }) {
 // --- Main Component ---
 
 export default function CalendarPage() {
+  const [mounted, setMounted] = useState(false);
+
   const today = useMemo(() => {
     const t = new Date();
     return { year: t.getFullYear(), month: t.getMonth(), day: t.getDate() };
@@ -226,9 +228,35 @@ export default function CalendarPage() {
     });
   }, [months, fetchMonth]);
 
-  // --- Infinite scroll: add months at edges ---
+  // --- Correct date on client mount & initial scroll ---
 
   useEffect(() => {
+    const now = new Date();
+    const clientMonth: MonthKey = { year: now.getFullYear(), month: now.getMonth() };
+
+    // If SSR date differs from client date, re-initialize
+    if (clientMonth.year !== todayMonth.year || clientMonth.month !== todayMonth.month) {
+      setActiveMonth(clientMonth);
+      setMonths(initMonths(clientMonth));
+    }
+
+    // Scroll to today's month after a frame (ensures DOM is ready)
+    requestAnimationFrame(() => {
+      const key = mkStr(clientMonth);
+      const marker = markerRefs.current.get(key);
+      if (marker) {
+        const top = marker.getBoundingClientRect().top + window.scrollY - 160;
+        window.scrollTo(0, top);
+      }
+      initialScrollDone.current = true;
+      setMounted(true);
+    });
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // --- Infinite scroll: add months at edges (only after initial scroll) ---
+
+  useEffect(() => {
+    if (!mounted) return;
     const topEl = topSentinelRef.current;
     const bottomEl = bottomSentinelRef.current;
     if (!topEl || !bottomEl) return;
@@ -259,20 +287,7 @@ export default function CalendarPage() {
     observer.observe(topEl);
     observer.observe(bottomEl);
     return () => observer.disconnect();
-  }, []);
-
-  // --- Initial scroll to today's month (before paint) ---
-
-  useLayoutEffect(() => {
-    if (initialScrollDone.current) return;
-    const key = mkStr(todayMonth);
-    const marker = markerRefs.current.get(key);
-    if (marker) {
-      const top = marker.getBoundingClientRect().top + window.scrollY - 160;
-      window.scrollTo(0, top);
-      initialScrollDone.current = true;
-    }
-  });
+  }, [mounted]);
 
   // --- Scroll-based active month detection ---
   // Find the month whose "own" days occupy the most visible area in the viewport.
