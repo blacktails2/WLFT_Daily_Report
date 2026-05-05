@@ -539,12 +539,17 @@ export default function CalendarPage() {
                       )}
                     </div>
                     {overview && (
-                      <p
-                        className="mt-1 min-h-0 flex-1 overflow-hidden text-[var(--color-main-hover)]"
-                        style={{ fontSize: "9px", lineHeight: "1.3", opacity: 0.5 }}
+                      <div
+                        className="mt-1 min-h-0 flex-1 overflow-hidden"
+                        style={{ maskImage: "linear-gradient(to bottom, black calc(100% - 20px), transparent)", WebkitMaskImage: "linear-gradient(to bottom, black calc(100% - 20px), transparent)" }}
                       >
-                        {overview}
-                      </p>
+                        <p
+                          className="text-[var(--color-main-hover)]"
+                          style={{ fontSize: "9px", lineHeight: "1.3", opacity: 0.5 }}
+                        >
+                          {overview}
+                        </p>
+                      </div>
                     )}
                   </button>
                 );
