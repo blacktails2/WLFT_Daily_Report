@@ -91,7 +91,17 @@ export default function ImportPage() {
       <div className="mb-6">
         <textarea
           value={rawContent}
-          onChange={(e) => handleParse(e.target.value)}
+          onChange={(e) => {
+            handleParse(e.target.value);
+            e.target.style.height = "auto";
+            e.target.style.height = e.target.scrollHeight + "px";
+          }}
+          ref={(el) => {
+            if (el) {
+              el.style.height = "auto";
+              el.style.height = el.scrollHeight + "px";
+            }
+          }}
           placeholder={"### 26/4/22 Mon\nToday I worked on...\n\n### 26/4/23 Tue\n..."}
           rows={1}
           className={`w-full py-2 text-sm font-mono focus:outline-none textarea-auto transition-all ease-in duration-100 bg-transparent border-b ${

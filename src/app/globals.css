@@ -116,8 +116,8 @@ a,
 }
 
 .textarea-auto {
-  field-sizing: content;
   resize: none;
+  overflow: hidden;
 }
 
 .page-title-text {

@@ -216,11 +216,11 @@ export default function ReportPage() {
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie data={donutData} dataKey="totalHours" nameKey="taskName" cx="50%" cy="45%" innerRadius={isMobile ? 70 : 115} outerRadius={isMobile ? 87 : 132} cornerRadius={9} paddingAngle={3} />
-                  <Tooltip content={<ChartTooltip />} isAnimationActive={false} wrapperStyle={{ transition: "opacity 150ms ease-out" }} />
+                  <Tooltip content={<ChartTooltip />} isAnimationActive={false} wrapperStyle={{ transition: "opacity 150ms ease-out", zIndex: 10 }} />
                 </PieChart>
               </ResponsiveContainer>
               {/* Center total */}
-              <div className="absolute left-1/2 pointer-events-none" style={{ top: "45%", transform: "translate(-50%, -50%)" }}>
+              <div className="absolute left-1/2 pointer-events-none z-0" style={{ top: "45%", transform: "translate(-50%, -50%)" }}>
                 <div className="text-center font-semibold text-[24px] md:text-[32px]" style={{ lineHeight: 1 }}>
                   {grandTotal}h
                 </div>

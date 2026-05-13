@@ -203,6 +203,14 @@ function HomeContent() {
             onChange={(e) => {
               setOverview(e.target.value);
               setSaved(false);
+              e.target.style.height = "auto";
+              e.target.style.height = e.target.scrollHeight + "px";
+            }}
+            ref={(el) => {
+              if (el) {
+                el.style.height = "auto";
+                el.style.height = el.scrollHeight + "px";
+              }
             }}
             placeholder="How was your day? General notes, misc tasks..."
             rows={1}
@@ -267,9 +275,17 @@ function HomeContent() {
                   {entry.hours > 0 && (
                     <textarea
                       value={entry.memo}
-                      onChange={(e) =>
-                        updateEntry(task.id, { memo: e.target.value })
-                      }
+                      onChange={(e) => {
+                        updateEntry(task.id, { memo: e.target.value });
+                        e.target.style.height = "auto";
+                        e.target.style.height = e.target.scrollHeight + "px";
+                      }}
+                      ref={(el) => {
+                        if (el) {
+                          el.style.height = "auto";
+                          el.style.height = el.scrollHeight + "px";
+                        }
+                      }}
                       placeholder="Notes for this task..."
                       rows={1}
                       className="w-full mt-2 py-1 text-sm focus:outline-none textarea-auto ml-6 bg-transparent"
