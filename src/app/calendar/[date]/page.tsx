@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useLayoutEffect, useRef, useCallback } from "react";
 import { Pencil, X } from "lucide-react";
 import { useRouter, useParams } from "next/navigation";
 import { displayDate } from "@/lib/utils";
@@ -133,75 +133,86 @@ export default function CalendarDetailPage() {
   const [hasNewer, setHasNewer] = useState(true);
   const loadingOlderRef = useRef(false);
   const loadingNewerRef = useRef(false);
+  const reportsRef = useRef<Report[]>([]);
+  reportsRef.current = reports;
+  // scrollHeight captured just before prepending, so the viewport can be
+  // shifted by the added height after commit
+  const scrollAdjustRef = useRef<number | null>(null);
 
   const topRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    let cancelled = false;
     setLoading(true);
+    setReports([]);
+    setHasOlder(true);
+    setHasNewer(true);
     fetch(`/api/daily-reports?around=${targetDate}&limit=10`)
       .then((r) => r.json())
       .then((data: Report[]) => {
+        if (cancelled) return;
         setReports(data);
         setLoading(false);
-        const targetIdx = data.findIndex((r) => r.date >= targetDate);
-        if (targetIdx < 10) setHasOlder(false);
-        if (data.length - targetIdx - 1 < 10) setHasNewer(false);
       });
+    return () => {
+      cancelled = true;
+    };
   }, [targetDate]);
 
   const loadOlder = useCallback(async () => {
     if (loadingOlderRef.current || !hasOlder) return;
+    const oldestDate = reportsRef.current[0]?.date;
+    if (!oldestDate) return;
     loadingOlderRef.current = true;
 
-    setReports((prev) => {
-      if (prev.length === 0) return prev;
-      const oldestDate = prev[0].date;
-      const scrollHeightBefore = document.documentElement.scrollHeight;
-
-      fetch(`/api/daily-reports?before=${oldestDate}&limit=5`)
-        .then((r) => r.json())
-        .then((data: Report[]) => {
-          if (data.length < 5) setHasOlder(false);
-          if (data.length > 0) {
-            setReports((p) => {
-              requestAnimationFrame(() => {
-                const diff = document.documentElement.scrollHeight - scrollHeightBefore;
-                window.scrollBy(0, diff);
-                loadingOlderRef.current = false;
-              });
-              return [...data, ...p];
-            });
-          } else {
-            loadingOlderRef.current = false;
-          }
+    try {
+      const res = await fetch(`/api/daily-reports?before=${oldestDate}&limit=5`);
+      const data: Report[] = await res.json();
+      if (data.length < 5) setHasOlder(false);
+      if (data.length > 0) {
+        scrollAdjustRef.current = document.documentElement.scrollHeight;
+        setReports((prev) => {
+          const existing = new Set(prev.map((r) => r.date));
+          return [...data.filter((r) => !existing.has(r.date)), ...prev];
         });
-
-      return prev;
-    });
+      }
+    } finally {
+      loadingOlderRef.current = false;
+    }
   }, [hasOlder]);
 
   const loadNewer = useCallback(async () => {
     if (loadingNewerRef.current || !hasNewer) return;
+    const newestDate = reportsRef.current[reportsRef.current.length - 1]?.date;
+    if (!newestDate) return;
     loadingNewerRef.current = true;
 
-    setReports((prev) => {
-      if (prev.length === 0) return prev;
-      const newestDate = prev[prev.length - 1].date;
-
-      fetch(`/api/daily-reports?after=${newestDate}&limit=5`)
-        .then((r) => r.json())
-        .then((data: Report[]) => {
-          if (data.length < 5) setHasNewer(false);
-          if (data.length > 0) setReports((p) => [...p, ...data]);
-          loadingNewerRef.current = false;
+    try {
+      const res = await fetch(`/api/daily-reports?after=${newestDate}&limit=5`);
+      const data: Report[] = await res.json();
+      if (data.length < 5) setHasNewer(false);
+      if (data.length > 0) {
+        setReports((prev) => {
+          const existing = new Set(prev.map((r) => r.date));
+          return [...prev, ...data.filter((r) => !existing.has(r.date))];
         });
-
-      return prev;
-    });
+      }
+    } finally {
+      loadingNewerRef.current = false;
+    }
   }, [hasNewer]);
 
+  useLayoutEffect(() => {
+    if (scrollAdjustRef.current !== null) {
+      const diff = document.documentElement.scrollHeight - scrollAdjustRef.current;
+      scrollAdjustRef.current = null;
+      if (diff > 0) window.scrollBy(0, diff);
+    }
+  }, [reports]);
+
   useEffect(() => {
+    if (loading) return;
     const topEl = topRef.current;
     const bottomEl = bottomRef.current;
     if (!topEl || !bottomEl) return;
@@ -222,14 +233,19 @@ export default function CalendarDetailPage() {
       topObserver.disconnect();
       bottomObserver.disconnect();
     };
-  }, [loadOlder, loadNewer]);
+    // reports is a dep so observers re-attach after each load; observe() fires
+    // immediately when a sentinel is still in view, continuing the load chain
+  }, [loading, reports, loadOlder, loadNewer]);
 
   return (
-    <div className="max-w-3xl px-4 pt-6 pb-24 md:px-6 md:pt-18 md:pb-6 relative z-10">
+    <div
+      className="max-w-3xl px-4 pt-6 pb-24 md:px-6 md:pt-18 md:pb-6 relative z-10"
+      style={{ overflowAnchor: "none" }}
+    >
       <PageTitle title="Detail" />
       <div className="sticky top-0 bg-[var(--color-bg)] z-20 flex items-center justify-end py-4 -mx-6 px-6 mb-6">
         <button
-          onClick={() => router.push("/calendar")}
+          onClick={() => router.push(`/calendar?month=${targetDate.slice(0, 7)}`)}
           className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-[var(--color-accent)] hover:text-white transition-all ease-in duration-100"
         >
           <X size={18} />

@@ -232,24 +232,33 @@ export default function CalendarPage() {
 
   useEffect(() => {
     const now = new Date();
-    const clientMonth: MonthKey = { year: now.getFullYear(), month: now.getMonth() };
+    let initialMonth: MonthKey = { year: now.getFullYear(), month: now.getMonth() };
 
-    // If SSR date differs from client date, re-initialize
-    if (clientMonth.year !== todayMonth.year || clientMonth.month !== todayMonth.month) {
-      setActiveMonth(clientMonth);
-      setMonths(initMonths(clientMonth));
+    // A ?month=YYYY-MM param (e.g. set when closing the detail view) overrides today
+    const monthParam = new URLSearchParams(window.location.search).get("month");
+    if (monthParam && /^\d{4}-\d{2}$/.test(monthParam)) {
+      const [y, m] = monthParam.split("-").map(Number);
+      if (m >= 1 && m <= 12) initialMonth = { year: y, month: m - 1 };
     }
 
-    // Scroll to today's month after a frame (ensures DOM is ready)
+    // If SSR date differs from the initial month, re-initialize
+    if (!mkEqual(initialMonth, todayMonth)) {
+      setActiveMonth(initialMonth);
+      setMonths(initMonths(initialMonth));
+    }
+
+    // Scroll to the initial month after re-render (double rAF ensures DOM is ready)
     requestAnimationFrame(() => {
-      const key = mkStr(clientMonth);
-      const marker = markerRefs.current.get(key);
-      if (marker) {
-        const top = marker.getBoundingClientRect().top + window.scrollY - 160;
-        window.scrollTo(0, top);
-      }
-      initialScrollDone.current = true;
-      setMounted(true);
+      requestAnimationFrame(() => {
+        const key = mkStr(initialMonth);
+        const marker = markerRefs.current.get(key);
+        if (marker) {
+          const top = marker.getBoundingClientRect().top + window.scrollY - 160;
+          window.scrollTo(0, top);
+        }
+        initialScrollDone.current = true;
+        setMounted(true);
+      });
     });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 

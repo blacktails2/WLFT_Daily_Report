@@ -1,7 +1,32 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
 import { dailyReports, timeEntries, tasks } from "@/db/schema";
-import { eq, gte, lte, lt, gt, and, asc, desc } from "drizzle-orm";
+import { eq, gte, lte, lt, gt, and, asc, desc, inArray } from "drizzle-orm";
+
+async function attachEntries(reports: (typeof dailyReports.$inferSelect)[]) {
+  const reportIds = reports.map((r) => r.id);
+  const entries =
+    reportIds.length > 0
+      ? await db
+          .select({
+            id: timeEntries.id,
+            reportId: timeEntries.reportId,
+            taskId: timeEntries.taskId,
+            hours: timeEntries.hours,
+            memo: timeEntries.memo,
+            taskName: tasks.name,
+            taskColor: tasks.color,
+          })
+          .from(timeEntries)
+          .innerJoin(tasks, eq(timeEntries.taskId, tasks.id))
+          .where(inArray(timeEntries.reportId, reportIds))
+      : [];
+
+  return reports.map((report) => ({
+    ...report,
+    entries: entries.filter((e) => e.reportId === report.id),
+  }));
+}
 
 export async function GET(request: NextRequest) {
   const from = request.nextUrl.searchParams.get("from");
@@ -34,29 +59,7 @@ export async function GET(request: NextRequest) {
       .limit(count);
 
     const allReports = [...before.reverse(), ...current, ...after];
-    const reportIds = allReports.map((r) => r.id);
-    const entries =
-      reportIds.length > 0
-        ? await db
-            .select({
-              id: timeEntries.id,
-              reportId: timeEntries.reportId,
-              taskId: timeEntries.taskId,
-              hours: timeEntries.hours,
-              memo: timeEntries.memo,
-              taskName: tasks.name,
-              taskColor: tasks.color,
-            })
-            .from(timeEntries)
-            .innerJoin(tasks, eq(timeEntries.taskId, tasks.id))
-        : [];
-
-    const result = allReports.map((report) => ({
-      ...report,
-      entries: entries.filter((e) => e.reportId === report.id),
-    }));
-
-    return NextResponse.json(result);
+    return NextResponse.json(await attachEntries(allReports));
   }
 
   // "before"/"after" mode: fetch N older/newer reports from a date
@@ -69,29 +72,7 @@ export async function GET(request: NextRequest) {
       .orderBy(desc(dailyReports.date))
       .limit(count);
 
-    const reportIds = reports.map((r) => r.id);
-    const entriesData =
-      reportIds.length > 0
-        ? await db
-            .select({
-              id: timeEntries.id,
-              reportId: timeEntries.reportId,
-              taskId: timeEntries.taskId,
-              hours: timeEntries.hours,
-              memo: timeEntries.memo,
-              taskName: tasks.name,
-              taskColor: tasks.color,
-            })
-            .from(timeEntries)
-            .innerJoin(tasks, eq(timeEntries.taskId, tasks.id))
-        : [];
-
-    const result = reports.reverse().map((report) => ({
-      ...report,
-      entries: entriesData.filter((e) => e.reportId === report.id),
-    }));
-
-    return NextResponse.json(result);
+    return NextResponse.json(await attachEntries(reports.reverse()));
   }
 
   if (afterDate) {
@@ -103,29 +84,7 @@ export async function GET(request: NextRequest) {
       .orderBy(asc(dailyReports.date))
       .limit(count);
 
-    const reportIds = reports.map((r) => r.id);
-    const entriesData =
-      reportIds.length > 0
-        ? await db
-            .select({
-              id: timeEntries.id,
-              reportId: timeEntries.reportId,
-              taskId: timeEntries.taskId,
-              hours: timeEntries.hours,
-              memo: timeEntries.memo,
-              taskName: tasks.name,
-              taskColor: tasks.color,
-            })
-            .from(timeEntries)
-            .innerJoin(tasks, eq(timeEntries.taskId, tasks.id))
-        : [];
-
-    const result = reports.map((report) => ({
-      ...report,
-      entries: entriesData.filter((e) => e.reportId === report.id),
-    }));
-
-    return NextResponse.json(result);
+    return NextResponse.json(await attachEntries(reports));
   }
 
   // Default: date range mode
@@ -139,30 +98,7 @@ export async function GET(request: NextRequest) {
     .where(conditions.length > 0 ? and(...conditions) : undefined)
     .orderBy(asc(dailyReports.date));
 
-  // Fetch time entries for all reports
-  const reportIds = reports.map((r) => r.id);
-  const entries =
-    reportIds.length > 0
-      ? await db
-          .select({
-            id: timeEntries.id,
-            reportId: timeEntries.reportId,
-            taskId: timeEntries.taskId,
-            hours: timeEntries.hours,
-            memo: timeEntries.memo,
-            taskName: tasks.name,
-            taskColor: tasks.color,
-          })
-          .from(timeEntries)
-          .innerJoin(tasks, eq(timeEntries.taskId, tasks.id))
-      : [];
-
-  const result = reports.map((report) => ({
-    ...report,
-    entries: entries.filter((e) => e.reportId === report.id),
-  }));
-
-  return NextResponse.json(result);
+  return NextResponse.json(await attachEntries(reports));
 }
 
 export async function POST(request: NextRequest) {
